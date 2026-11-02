@@ -1,38 +1,28 @@
-# Café 7 — QR & NFC Digital Menu System
+# Café 7 — Standalone Digital Menu Alone
 
-> **Freshly Crafted. Served with Care.**
-> Official Digital Menu & Table Standee System for Café 7, Valasaravakkam, Chennai.
-
----
-
-## 🚀 Live Links
-
-* **Direct Menu Only (QR & NFC Target):** [https://cafe--7.vercel.app/menu](https://cafe--7.vercel.app/menu)
-* **Table-Specific Menu Format:** `https://cafe--7.vercel.app/menu?table=1`
-* **Owner QR & Standee Portal:** [https://cafe--7.vercel.app/qr](https://cafe--7.vercel.app/qr)
-* **Café 7 Homepage:** [https://cafe--7.vercel.app/](https://cafe--7.vercel.app/)
+> **100% Pure Digital Menu Alone — No Landing Page, No Marketing Fluff, No Hero Banners.**
+> Fast, camera-ready digital menu designed specifically for QR code scans and NFC table standees.
 
 ---
 
-## 🍽️ Features
+## 🍽️ Direct Links
 
-* **Instant Digital Menu**: Direct access to all 17 categories and 89 food/drink items without landing page fluff or hero banners.
-* **Diet Filters**: Instant toggle between All Diets, Veg Only 🌱, and Non-Veg 🍗.
-* **Real-Time Search**: Search through items, burgers, wraps, coffees, wings, and shakes with live matching.
+* **Menu Alone Link:** [https://cafe--7.vercel.app/](https://cafe--7.vercel.app/) *(and [/menu](https://cafe--7.vercel.app/menu))*
+* **Table-Specific Format:** `https://cafe--7.vercel.app/?table=1`
+* **Table Standee & QR Portal:** [https://cafe--7.vercel.app/qr](https://cafe--7.vercel.app/qr)
+
+---
+
+## 🚀 Key Features
+
+* **Strictly Menu Alone**: Opens directly into the food & beverage menu. No hero banners, no "About Us" marketing copy, no website landing page.
+* **17 Categories & 89 Items**: Gourmet burgers, crispy wings, wraps, fries, artisan coffee, milkshakes, mojitos, and value combos.
+* **1-Tap Diet Filters**: Instant switching between **All Diets**, **Veg Only 🌱**, and **Non-Veg 🍗**.
+* **Live Search**: Instant keyword search for any dish or beverage.
 * **1-Click WhatsApp Ordering**: Automatically formats order summaries and sends them to the café WhatsApp line (`+91 9677419178`).
 * **Table QR Code Generator**: Generates high-contrast camera-ready QR codes with the Café 7 logo badge in the center (Error Correction Level H).
 * **Print-Ready A6 Table Standees**: Sized for standard 105 mm × 148 mm acrylic table stands with direct browser printing.
 * **NFC Tag Support**: Web URI payload ready to write to any NTAG213 / NTAG215 / NTAG216 chip in seconds using NFC Tools.
-
----
-
-## 💻 Tech Stack
-
-* **Framework**: Next.js 15 (App Router, Static Site Generation)
-* **Styling**: Tailwind CSS with custom Café 7 palette
-* **Icons**: Lucide React
-* **QR Engine**: `qrcode` with Error Correction Level H
-* **Typography**: Playfair Display & Inter
 
 ---
 
