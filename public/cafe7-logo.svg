@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="cafeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2F2622"/>
+      <stop offset="100%" stop-color="#1B1513"/>
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#D2B08A"/>
+      <stop offset="100%" stop-color="#A97A55"/>
+    </linearGradient>
+  </defs>
+  <rect width="200" height="200" rx="40" fill="url(#cafeGrad)"/>
+  <rect x="8" y="8" width="184" height="184" rx="34" fill="none" stroke="url(#goldGrad)" stroke-width="4"/>
+  <circle cx="100" cy="52" r="14" fill="#A97A55" opacity="0.3"/>
+  <path d="M93 52 C93 46 107 46 107 52 C107 58 93 58 93 52 Z" fill="#D2B08A"/>
+  <path d="M100 44 L100 60" stroke="#2F2622" stroke-width="1.5"/>
+  <text x="100" y="105" text-anchor="middle" font-family="'Playfair Display', Georgia, serif" font-weight="900" font-size="34" fill="#FFFFFF" letter-spacing="4">CAFÉ</text>
+  <text x="100" y="152" text-anchor="middle" font-family="'Playfair Display', Georgia, serif" font-weight="900" font-size="44" fill="#D2B08A">7</text>
+  <text x="100" y="174" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="9" fill="#E8D8C6" letter-spacing="2.5">CHENNAI</text>
+</svg>
