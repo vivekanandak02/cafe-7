@@ -2,15 +2,14 @@ const fs = require('fs');
 const path = require('path');
 const QRCode = require('qrcode');
 
-// Pointing directly to the dedicated Menu route!
-const targetUrl = 'https://cafe--7.vercel.app/menu';
+// Standalone menu target URL
+const targetUrl = 'https://cafe--7.vercel.app/';
 const outputDir = 'C:\\Users\\Vivekanandan\\.gemini\\antigravity\\scratch\\cafe7\\public';
 const brainDir = 'C:\\Users\\Vivekanandan\\.gemini\\antigravity\\brain\\f71a7a2d-c95d-4a23-bb32-142dad2b5c28';
 
 async function generateDownloads() {
   console.log('Generating QR code assets for:', targetUrl);
 
-  // 1. Generate crisp high-contrast SVG
   const rawSvg = await QRCode.toString(targetUrl, {
     type: 'svg',
     margin: 3,
@@ -56,7 +55,6 @@ async function generateDownloads() {
   fs.writeFileSync(svgPath2, finalSvg);
   console.log('Saved SVG to:', svgPath1);
 
-  // 2. Generate crisp high-resolution PNG using QRCode.toFile
   const pngPath1 = path.join(outputDir, 'cafe7-menu-qr-highres.png');
   const pngPath2 = path.join(brainDir, 'cafe7-menu-qr-highres.png');
 

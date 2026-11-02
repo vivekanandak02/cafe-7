@@ -13,14 +13,13 @@ import {
   Radio,
   Sparkles,
   QrCode,
-  ExternalLink,
   Settings2,
   ShieldCheck,
   UtensilsCrossed,
 } from "lucide-react";
 
 export default function QRCodeGeneratorPage() {
-  const [urlOption, setUrlOption] = useState<"menu-only" | "table" | "homepage">("menu-only");
+  const [urlOption, setUrlOption] = useState<"menu-root" | "table" | "menu-route">("menu-root");
   const [tableNumber, setTableNumber] = useState<string>("1");
   const [includeLogo, setIncludeLogo] = useState<boolean>(true);
   const [resolution, setResolution] = useState<number>(1600);
@@ -30,18 +29,18 @@ export default function QRCodeGeneratorPage() {
   const [qrSvgString, setQrSvgString] = useState<string>("");
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-  // Compute final effective URL - defaults strictly to dedicated standalone menu!
+  // Compute final effective URL - strictly the standalone digital menu!
   const effectiveUrl = (() => {
-    if (urlOption === "menu-only") {
-      return "https://cafe--7.vercel.app/menu";
-    }
-    if (urlOption === "table") {
-      return `https://cafe--7.vercel.app/menu?table=${encodeURIComponent(tableNumber)}`;
-    }
-    if (urlOption === "homepage") {
+    if (urlOption === "menu-root") {
       return "https://cafe--7.vercel.app/";
     }
-    return "https://cafe--7.vercel.app/menu";
+    if (urlOption === "table") {
+      return `https://cafe--7.vercel.app/?table=${encodeURIComponent(tableNumber)}`;
+    }
+    if (urlOption === "menu-route") {
+      return "https://cafe--7.vercel.app/menu";
+    }
+    return "https://cafe--7.vercel.app/";
   })();
 
   // Generate QR Code on canvas and as SVG whenever parameters change
@@ -50,69 +49,59 @@ export default function QRCodeGeneratorPage() {
 
     async function generateQR() {
       try {
-        // 1. Generate high-resolution Canvas (for PNG export)
         const canvas = canvasRef.current || document.createElement("canvas");
         const size = resolution;
         canvas.width = size;
         canvas.height = size;
 
-        // Use Error Correction Level 'H' (High ~30% recovery) to support center logo without failing decode
         await QRCode.toCanvas(canvas, effectiveUrl, {
           width: size,
           margin: 3,
           errorCorrectionLevel: "H",
           color: {
-            dark: "#1B1513", // Deep espresso
-            light: "#FFFFFF", // High-contrast crisp white
+            dark: "#1B1513",
+            light: "#FFFFFF",
           },
         });
 
-        // If includeLogo is true, draw Café 7 badge in center of canvas
         if (includeLogo) {
           const ctx = canvas.getContext("2d");
           if (ctx) {
-            const logoSize = size * 0.24; // 24% size leaves 76% readable QR data
+            const logoSize = size * 0.24;
             const center = size / 2;
             const x = center - logoSize / 2;
             const y = center - logoSize / 2;
             const radius = logoSize * 0.22;
 
-            // Clear center area with white background and soft shadow
             ctx.save();
             ctx.shadowColor = "rgba(0, 0, 0, 0.15)";
             ctx.shadowBlur = size * 0.015;
             ctx.shadowOffsetX = 0;
             ctx.shadowOffsetY = size * 0.005;
 
-            // White backing plate
             ctx.fillStyle = "#FFFFFF";
             ctx.beginPath();
             ctx.roundRect(x - 4, y - 4, logoSize + 8, logoSize + 8, radius + 2);
             ctx.fill();
             ctx.restore();
 
-            // Inner dark espresso badge
             ctx.save();
             ctx.fillStyle = "#2F2622";
             ctx.beginPath();
             ctx.roundRect(x, y, logoSize, logoSize, radius);
             ctx.fill();
 
-            // Gold border
             ctx.strokeStyle = "#D2B08A";
             ctx.lineWidth = Math.max(3, size * 0.006);
             ctx.stroke();
 
-            // Text: CAFE 7
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
 
-            // "CAFÉ"
             ctx.fillStyle = "#FFFFFF";
             ctx.font = `900 ${logoSize * 0.22}px 'Playfair Display', Georgia, serif`;
             ctx.fillText("CAFÉ", center, center - logoSize * 0.12);
 
-            // "7" in gold
             ctx.fillStyle = "#D2B08A";
             ctx.font = `900 ${logoSize * 0.35}px 'Playfair Display', Georgia, serif`;
             ctx.fillText("7", center, center + logoSize * 0.18);
@@ -126,7 +115,6 @@ export default function QRCodeGeneratorPage() {
           setQrPngUrl(pngUrl);
         }
 
-        // 2. Generate crisp SVG vector string
         const rawSvg = await QRCode.toString(effectiveUrl, {
           type: "svg",
           margin: 3,
@@ -189,7 +177,7 @@ export default function QRCodeGeneratorPage() {
     const filename =
       urlOption === "table"
         ? `cafe7-table-${tableNumber}-menu-qr.png`
-        : "cafe7-menu-only-qr.png";
+        : "cafe7-menu-alone-qr.png";
     a.download = filename;
     document.body.appendChild(a);
     a.click();
@@ -205,7 +193,7 @@ export default function QRCodeGeneratorPage() {
     const filename =
       urlOption === "table"
         ? `cafe7-table-${tableNumber}-menu-qr.svg`
-        : "cafe7-menu-only-qr.svg";
+        : "cafe7-menu-alone-qr.svg";
     a.download = filename;
     document.body.appendChild(a);
     a.click();
@@ -242,24 +230,17 @@ export default function QRCodeGeneratorPage() {
               CAFE 7
             </Link>
             <span className="hidden sm:inline-block text-xs font-semibold px-2.5 py-0.5 rounded-full bg-[#FAF3EA] text-[#A97A55] border border-[#E8D8C6]">
-              Owner QR & Standee Portal
+              Table QR & Standee Portal
             </span>
           </div>
 
           <div className="flex items-center space-x-3">
             <Link
-              href="/menu"
-              className="inline-flex items-center space-x-1.5 text-xs font-semibold text-[#2F2622] hover:text-[#A97A55] px-3 py-1.5 rounded-full border border-[#E8D8C6] bg-white transition"
-            >
-              <UtensilsCrossed className="w-3.5 h-3.5 text-[#A97A55]" />
-              <span>Preview Menu</span>
-            </Link>
-            <Link
               href="/"
-              className="inline-flex items-center space-x-1 text-xs font-semibold text-[#A97A55] hover:text-[#8e643f] px-3 py-1.5 rounded-full border border-[#E8D8C6] bg-white transition"
+              className="inline-flex items-center space-x-1.5 text-xs font-semibold text-[#A97A55] hover:text-[#8e643f] px-3.5 py-1.5 rounded-full border border-[#E8D8C6] bg-white transition"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Website</span>
+              <span>Back to Menu Alone</span>
             </Link>
           </div>
         </div>
@@ -267,19 +248,19 @@ export default function QRCodeGeneratorPage() {
 
       {/* Main Content Area */}
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        {/* Intro Banner - hidden during print */}
+        {/* Intro Banner */}
         <div className="no-print mb-8">
           <div className="inline-flex items-center space-x-2 bg-[#FAF3EA] px-3 py-1 rounded-full border border-[#E8D8C6] mb-3">
             <Sparkles className="w-3.5 h-3.5 text-[#A97A55]" />
             <span className="text-xs font-semibold uppercase tracking-[0.25em] text-[#A97A55]">
-              Direct Menu QR & NFC Standee System
+              Standalone Digital Menu Standee
             </span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-[#2F2622] font-serif">
-            Café 7 Digital Menu QR Code Generator
+            Café 7 Standalone Menu QR Code Generator
           </h1>
           <p className="mt-2 text-xs sm:text-sm text-[#3B312C]/85 max-w-2xl leading-relaxed">
-            When a customer scans this QR code or taps the NFC tag, they are brought <strong>directly to the menu</strong> with food categories, item images, prices, and WhatsApp ordering without landing on the homepage or scrolling through hero banners.
+            When a customer scans this QR code or taps the NFC tag, they are brought <strong>strictly to the menu alone</strong>.
           </p>
         </div>
 
@@ -298,9 +279,9 @@ export default function QRCodeGeneratorPage() {
               {/* URL Options */}
               <div className="mt-4 space-y-3">
                 <label
-                  onClick={() => setUrlOption("menu-only")}
+                  onClick={() => setUrlOption("menu-root")}
                   className={`flex items-start p-3 rounded-2xl border cursor-pointer transition ${
-                    urlOption === "menu-only"
+                    urlOption === "menu-root"
                       ? "bg-[#FAF3EA] border-[#A97A55] text-[#2F2622]"
                       : "bg-[#FBF8F4] border-[#E8D8C6] hover:bg-[#F4EEE7]"
                   }`}
@@ -308,22 +289,22 @@ export default function QRCodeGeneratorPage() {
                   <input
                     type="radio"
                     name="urlOption"
-                    checked={urlOption === "menu-only"}
-                    onChange={() => setUrlOption("menu-only")}
+                    checked={urlOption === "menu-root"}
+                    onChange={() => setUrlOption("menu-root")}
                     className="mt-1 mr-3 accent-[#A97A55]"
                   />
                   <div>
                     <div className="text-xs font-bold text-[#2F2622] flex items-center gap-1.5">
-                      <span>Direct Menu Only (Recommended)</span>
+                      <span>Menu Alone (Root URL)</span>
                       <span className="bg-emerald-600 text-white text-[9px] px-1.5 py-0.2 rounded-full font-bold">
-                        DIRECT
+                        RECOMMENDED
                       </span>
                     </div>
                     <div className="text-[11px] text-stone-500 font-mono mt-0.5">
-                      https://cafe--7.vercel.app/menu
+                      https://cafe--7.vercel.app/
                     </div>
                     <div className="text-[11px] text-[#A97A55] mt-1 font-medium">
-                      Opens straight to the food & drinks menu without any landing page or hero banner.
+                      Opens directly to the menu alone.
                     </div>
                   </div>
                 </label>
@@ -344,9 +325,9 @@ export default function QRCodeGeneratorPage() {
                     className="mt-1 mr-3 accent-[#A97A55]"
                   />
                   <div className="flex-1">
-                    <div className="text-xs font-bold">Table-Specific Menu</div>
+                    <div className="text-xs font-bold">Table-Specific Standee</div>
                     <div className="text-[11px] text-stone-500 font-mono mt-0.5">
-                      https://cafe--7.vercel.app/menu?table={tableNumber}
+                      https://cafe--7.vercel.app/?table={tableNumber}
                     </div>
                     {urlOption === "table" && (
                       <div className="mt-2 flex items-center space-x-2">
@@ -364,9 +345,9 @@ export default function QRCodeGeneratorPage() {
                 </label>
 
                 <label
-                  onClick={() => setUrlOption("homepage")}
+                  onClick={() => setUrlOption("menu-route")}
                   className={`flex items-start p-3 rounded-2xl border cursor-pointer transition ${
-                    urlOption === "homepage"
+                    urlOption === "menu-route"
                       ? "bg-[#FAF3EA] border-[#A97A55] text-[#2F2622]"
                       : "bg-[#FBF8F4] border-[#E8D8C6] hover:bg-[#F4EEE7]"
                   }`}
@@ -374,14 +355,14 @@ export default function QRCodeGeneratorPage() {
                   <input
                     type="radio"
                     name="urlOption"
-                    checked={urlOption === "homepage"}
-                    onChange={() => setUrlOption("homepage")}
+                    checked={urlOption === "menu-route"}
+                    onChange={() => setUrlOption("menu-route")}
                     className="mt-1 mr-3 accent-[#A97A55]"
                   />
                   <div>
-                    <div className="text-xs font-bold">Full Website Homepage</div>
+                    <div className="text-xs font-bold">Route: /menu</div>
                     <div className="text-[11px] text-stone-500 font-mono mt-0.5">
-                      https://cafe--7.vercel.app/
+                      https://cafe--7.vercel.app/menu
                     </div>
                   </div>
                 </label>
@@ -390,7 +371,7 @@ export default function QRCodeGeneratorPage() {
               {/* Active URL Card */}
               <div className="mt-4 p-3 rounded-2xl bg-[#FAF7F2] border border-[#E8D8C6]">
                 <div className="flex items-center justify-between text-xs mb-1">
-                  <span className="font-semibold text-[#2F2622]">Scan Destination URL:</span>
+                  <span className="font-semibold text-[#2F2622]">Scan Target URL:</span>
                   <button
                     onClick={handleCopyUrl}
                     className="inline-flex items-center space-x-1 text-[#A97A55] hover:text-[#8e643f] font-semibold cursor-pointer"
@@ -413,7 +394,7 @@ export default function QRCodeGeneratorPage() {
                 </div>
                 <div className="mt-2 flex items-center space-x-1 text-[11px] text-emerald-700 font-medium">
                   <ShieldCheck className="w-3.5 h-3.5" />
-                  <span>Production URL • No login required for customers</span>
+                  <span>Opens strictly to the menu alone • No login required</span>
                 </div>
               </div>
             </div>
@@ -479,7 +460,7 @@ export default function QRCodeGeneratorPage() {
             </div>
           </div>
 
-          {/* Right Column: QR Code Preview & Direct Standee Actions */}
+          {/* Right Column: QR Code Preview */}
           <div className="lg:col-span-7 space-y-6">
             <div className="bg-white border border-[#E8D8C6] rounded-3xl p-6 shadow-sm">
               <div className="flex items-center justify-between pb-3 border-b border-[#E8D8C6]">
@@ -498,7 +479,6 @@ export default function QRCodeGeneratorPage() {
                 </button>
               </div>
 
-              {/* Centered QR Display */}
               <div className="mt-5 flex flex-col items-center justify-center">
                 <div className="relative p-5 bg-white rounded-3xl border border-[#E8D8C6] shadow-md inline-block">
                   {qrPngUrl ? (
@@ -517,10 +497,10 @@ export default function QRCodeGeneratorPage() {
 
                 <div className="mt-3 text-center">
                   <p className="text-xs font-bold text-[#2F2622]">
-                    Points to: <span className="font-mono text-[#A97A55]">{effectiveUrl}</span>
+                    Points directly to: <span className="font-mono text-[#A97A55]">{effectiveUrl}</span>
                   </p>
                   <p className="text-[11px] text-stone-500 mt-0.5">
-                    Opens directly into the menu categories & prices!
+                    Shows only the menu alone!
                   </p>
                 </div>
               </div>
@@ -559,7 +539,7 @@ export default function QRCodeGeneratorPage() {
                 </div>
 
                 <p className="text-[11px] text-stone-600">
-                  Write this exact URL to your physical NTAG213 / NTAG215 table tags using <strong>NFC Tools</strong> app. When customers tap, their phone immediately pops open the Café 7 menu.
+                  Write this exact URL to your physical table NFC tags using the <strong>NFC Tools</strong> app. When customers tap, their phone immediately opens the Café 7 menu alone.
                 </p>
               </div>
             </div>
@@ -586,7 +566,6 @@ export default function QRCodeGeneratorPage() {
             </button>
           </div>
 
-          {/* Standee Container (Sized for A6 proportions: 105 x 148 mm ~ 1 : 1.41) */}
           <div className="flex justify-center p-2">
             <div
               id="standee-print-card"
@@ -597,7 +576,6 @@ export default function QRCodeGeneratorPage() {
             >
               <div className="absolute top-2 left-2 right-2 bottom-2 rounded-2xl border border-[#D2B08A]/40 pointer-events-none" />
 
-              {/* Standee Header */}
               <div className="pt-1 relative z-10">
                 <div className="inline-block px-3 py-0.5 rounded-full bg-[#2F2622] text-[#D2B08A] text-[9px] font-bold uppercase tracking-[0.25em] mb-1.5">
                   {urlOption === "table" ? `Table ${tableNumber} • Digital Menu` : "Digital Table Menu"}
@@ -610,7 +588,6 @@ export default function QRCodeGeneratorPage() {
                 </p>
               </div>
 
-              {/* QR Code Graphic Box */}
               <div className="my-2 flex flex-col items-center justify-center relative z-10">
                 <div className="p-2.5 bg-white rounded-2xl border-2 border-[#E8D8C6] shadow-md inline-block">
                   {qrPngUrl ? (
@@ -628,7 +605,6 @@ export default function QRCodeGeneratorPage() {
                 </div>
               </div>
 
-              {/* Dual Action: Scan Camera & NFC Tap */}
               <div className="relative z-10 space-y-1.5">
                 <div className="grid grid-cols-2 gap-2 text-center">
                   <div className="p-1.5 rounded-xl bg-white/90 border border-[#E8D8C6] flex flex-col items-center">
@@ -651,7 +627,6 @@ export default function QRCodeGeneratorPage() {
                 </p>
               </div>
 
-              {/* Standee Footer */}
               <div className="pt-1.5 border-t border-[#E8D8C6]/80 text-[8px] text-[#3B312C] relative z-10 space-y-0.5">
                 <p className="font-semibold text-[#2F2622]">
                   74, Radha Ave Main Rd, Valasaravakkam, Chennai
